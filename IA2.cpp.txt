@@ -1,0 +1,134 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+
+// Convert a string to lowercase for case-insensitive comparison
+std::string toLowerCase(const std::string& s) {
+    std::string result = s;
+    for (char& c : result) {
+        c = std::tolower(c);
+    }
+    return result;
+}
+
+struct Member {
+    int id;
+    std::string name;
+    std::string phone;
+    std::string address;
+    double maintenanceFee;
+};
+
+double calculatePaymentAmount(const Member& member) {
+    // In a real-world application, you might have a more complex calculation
+    // Here, we'll use the maintenanceFee as the payment amount
+    return member.maintenanceFee;
+}
+
+void makePayment(int memberId, double amount, std::vector<Member>& members) {
+    // In a real-world application, you would integrate a payment gateway here
+    // This is a simplified example, so we just simulate the payment
+    std::cout << "Simulating payment of $" << amount << " for Member ID " << memberId << std::endl;
+
+    // Update the maintenance fee for the member
+    for (Member& member : members) {
+        if (member.id == memberId) {
+            member.maintenanceFee += amount;
+            std::cout << "Payment of $" << amount << " made for " << member.name << ". Total maintenance fee: $" << member.maintenanceFee << std::endl;
+            return;
+        }
+    }
+
+    std::cout << "Member with ID " << memberId << " not found." << std::endl;
+}
+
+void generateQRCode() {
+    // Simulate QR code generation
+    std::cout << "QR Code generated." << std::endl;
+}
+
+void sendUPILink() {
+    // Simulate sending a UPI payment link
+    std::cout << "UPI Payment link sent." << std::endl;
+}
+
+int main() {
+    std::vector<Member> members;
+    std::map<int, Member> memberRegistry;
+
+    auto addMember = [&](int memberId, const std::string& name, const std::string& phone, const std::string& address, double initialFee) {
+        Member newMember = {memberId, name, phone, address, initialFee};
+        members.push_back(newMember);
+        memberRegistry[memberId] = newMember;
+    };
+
+    addMember(1, "Samantha", "123-456-7890", "123 Main St", 300.0);
+    addMember(2, "Rachel", "987-654-3210", "456 Elm St", 300.0);
+    addMember(3, "Jennie", "123-456-7890", "987 South St", 300.0);
+
+    std::cout << "Member List:\n";
+    for (const auto& member : members) {
+        std::cout << "ID: " << member.id << ", Name: " << member.name << ", Phone: " << member.phone << ", Address: " << member.address << ", Maintenance Fee: $" << member.maintenanceFee << std::endl;
+    }
+
+    std::string memberName;
+    double paymentAmount;
+
+    // Prompt the user to enter the member's name
+    std::cout << "Enter the Member's Name: ";
+    std::cin.ignore();
+    std::getline(std::cin, memberName);
+
+    bool memberFound = false;
+
+    // Find the member by name (case-insensitive)
+    for (const Member& member : members) {
+        if (toLowerCase(member.name) == toLowerCase(memberName)) {
+            memberFound = true;
+
+            // Calculate the payment amount
+            double paymentAmount = calculatePaymentAmount(member);
+            std::cout << "Payment amount for " << member.name << " is $" << paymentAmount << std::endl;
+
+            // Provide payment options to the user
+            std::cout << "1. Make Payment" << std::endl;
+            std::cout << "2. Cancel" << std::endl;
+
+            int option;
+            std::cout << "Enter your choice (1 or 2): ";
+            std::cin >> option;
+
+            if (option == 1) {
+                // Make the maintenance payment
+                makePayment(member.id, paymentAmount, members);
+
+                // After making payment, provide additional options
+                std::cout << "Additional Options:\n";
+                std::cout << "01. Generate QR Code" << std::endl;
+                std::cout << "02. Send UPI Payment Link" << std::endl;
+                int additionalOption;
+                std::cout << "Enter your choice (01 or 02): ";
+                std::cin >> additionalOption;
+
+                if (additionalOption == 01) {
+                    generateQRCode();
+                } else if (additionalOption == 02) {
+                    sendUPILink();
+                } else {
+                    std::cout << "Invalid choice." << std::endl;
+                }
+            } else {
+                std::cout << "Payment canceled." << std::endl;
+            }
+
+            break;
+        }
+    }
+
+    if (!memberFound) {
+        std::cout << "No member with the name " << memberName << " found." << std::endl;
+    }
+
+    return 0;
+}
